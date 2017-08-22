@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<title>YYDebugView</title>
+	<meta name="description" content="" />
+<link rel="stylesheet" href="https://yal.cc/r/gml/style.css?v=17-04-04"/>
+<style type="text/css">
+body {
+	margin: 0;
+	background: #f0f0f0;
+	font: 15px sans-serif;
+}
+body, #main {
+	height: 100%;
+	height: 100vh;
+	box-sizing: border-box;
+}
+table {
+	width: 100%;
+	padding: 1px;
+}
+table td {
+	padding: 0;
+	box-sizing: border-box;
+	position: relative;
+}
+#main #nav-td, #main #code-td {
+	padding: 2px;
+}
+textarea {
+	width: 100%;
+	height: 100%;
+	resize: none;
+	box-sizing: border-box;
+	overflow-y: scroll;
+}
+#nav {
+	overflow: auto;
+	background: white;
+	box-sizing: border-box;
+	border: 1px solid #aaa;
+	height: calc(100vh - 30px);
+}
+#nav a {
+	display: block;
+	line-height: 1.25;
+	color: black;
+	text-decoration: none;
+	padding-left: 4px;
+}
+#nav #nav-current {
+	background: #007BDF;
+	color: white;
+}
+#nav a:hover {
+	background: #E5F3FF;
+}
+#picker {
+	border: 0;
+	width: 100%;
+	padding: 1px 1px;
+}
+.top label {
+	vertical-align: middle;
+	line-height: 23px;
+}
+.ace_gutter-layer {
+	min-width: 48px;
+}
+</style>
+</head>
+<body>
+<table id="main"><tr>
+<td id="nav-td" width="200" valign="top">
+	<div class="top">
+		<input type="file" id="picker" accept=".yydebug" />
+	</div><div class="bottom">
+		<div id="nav"></div>
+	</div>
+</td>
+<td id="splitter-td" width="5">
+	
+</td>
+<td id="code-td" valign="top">
+	<div class="top">
+		<div class="about">by
+			<a href="https://twitter.com/YellowAfterlife">@YellowAfterlife</a>
+		</div>
+		<label>See <a href="https://yal.cc/gamemaker-recovering-lost-work/">blog post</a> for more information.</label>
+	</div><div class="bottom gml">
+		<textarea id="source">/*
+Privacy policy: files are processed entirely client-side (on your computer).
+You can also save this page and use the tool offline if you need to.
+*/</textarea>
+	</div>
+</td>
+</tr></table>
+<script type="text/javascript">
+(function() { // splitter
+	var sp = document.getElementById("splitter-td");
+	var eq = document.getElementById("nav-td");
+	var qq = document.getElementById("nav");
+	var gq = document.getElementById("main");
+	var ls = window.localStorage;
+	var sp_mousemove, sp_mouseup, sp_x, sp_y;
+	sp_mousemove = function(e) {
+		var nx = e.pageX, dx = nx - sp_x; sp_x = nx;
+		var ny = e.pageY, dy = ny - sp_y; sp_y = ny;
+		var nw = parseFloat(eq.getAttribute("width")) +
+			dx * (eq.parentElement.children[0] == eq ? 1 : -1);
+		eq.setAttribute("width", nw);
+		qq.style.width = nw + "px";
+	};
+	sp_mouseup = function(e) {
+		document.removeEventListener("mousemove", sp_mousemove);
+		document.removeEventListener("mouseup", sp_mouseup);
+		gq.classList.remove("resizing");
+		if (ls) ls.setItem("yydebugview-splitter-width", "" + eq.getAttribute("width"));
+	};
+	sp.addEventListener("mousedown", function(e) {
+		sp_x = e.pageX; sp_y = e.pageY;
+		document.addEventListener("mousemove", sp_mousemove);
+		document.addEventListener("mouseup", sp_mouseup);
+		gq.classList.add("resizing");
+		e.preventDefault();
+	});
+	if (ls) {
+		var cw = parseFloat(ls.getItem("yydebugview-splitter-width") || "200");
+		eq.setAttribute("width", cw)
+		qq.style.width = cw + "px";
+	}
+})();
+</script>
+<script src="YYDebugView.js"></script>
+<script type="text/javascript" src="https://yal.cc/r/gml/ace/gml-api.js?v=17-04-04"></script>
+<script type="text/javascript" src="https://yal.cc/r/gml/ace/src-noconflict/ace.js" charset="utf-8"></script>
+<script type="text/javascript" src="https://yal.cc/r/gml/ace/src-noconflict/ext-language_tools.js"></script>
+<script type="text/javascript" src="https://yal.cc/r/gml/ace/ace-gml.js?v=17-04-06" charset="utf-8"></script>
+<script type="text/javascript" src="https://yal.cc/r/gml/ace/ace-bind.js?v=17-04-04" charset="utf-8"></script>
+<!-- stats and such -->
+<script type="text/javascript">var _gaq = _gaq||[];_gaq.push(['_setAccount','UA-36439133-1']);_gaq.push(['_trackPageview']);</script>
+<script type="text/javascript" async="true" src="http://www.google-analytics.com/ga.js"></script>
+</body>
+</html>
