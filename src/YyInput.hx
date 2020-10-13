@@ -14,6 +14,17 @@ class YyInput extends BytesInput {
 		for (i in 0 ... n) r[i] = readInt32();
 		return r;
 	}
+	public function readRefCStringVector(stringOffset:Int = 0):Vector<String> {
+		var offsets = readInt32Vector();
+		var oldPos = position;
+		var strings = new Vector<String>(offsets.length);
+		for (i in 0 ... offsets.length) {
+			position = offsets[i] + stringOffset;
+			strings[i] = readRefCString();
+		}
+		position = oldPos;
+		return strings;
+	}
 	public function readCString():String {
 		var q = position, n = 0;
 		while (readByte() != 0) n++;

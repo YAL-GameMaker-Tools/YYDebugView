@@ -7,7 +7,7 @@ import haxe.io.BytesInput;
 import js.Browser;
 import js.Lib;
 import js.html.AnchorElement;
-import js.html.ArrayBuffer;
+import js.lib.ArrayBuffer;
 import js.html.Element;
 import js.html.Event;
 import js.html.FileList;
@@ -57,22 +57,51 @@ class Main {
 			show("// Supplied file doesn't seem to be a valid GMS debug file.");
 			return;
 		}
+		//trace(chunks);
 		//
 		input.position = chunks["SCPT"];
-		var positions = input.readInt32Vector();
-		var count = positions.length;
-		sources = new Vector(count);
-		for (i in 0 ... count) {
-			input.position = positions[i];
-			sources[i] = input.readRefCString().trim();
-		}
+		if (chunks.exists("DFNC")) {
+			//var scpt = input.readRefCStringVector();
+			//Browser.console.log("SCPT", scpt);
+			// 2.3 YYDebug files are a trouble!
+			// - If there are multiple functions in a script/event, SCPT has repeating entries
+			// - LOCL still only has actual sources
+			// - A new DFNC chunk only has function names
+			// In other words, it's kind of hard to match code to LOCL now!
+			// I attempt to do so by ignoring duplicate entries in SCPT.
+			// Totally breaks if two scripts/events in a row have identical code tho.
+			input.position = chunks["SCPT"];
+			var offsets = input.readInt32Vector();
+			var last = -1;
+			var sourcesArr = [];
+			for (offset in offsets) {
+				input.position = offset;
+				var stringPos = input.readInt32();
+				if (stringPos == last) continue;
+				last = stringPos;
+				input.position = offset;
+				sourcesArr.push(input.readRefCString());
+			}
+			sources = Vector.fromData(sourcesArr);
+		} else sources = input.readRefCStringVector();
+		for (i in 0 ... sources.length) sources[i] = sources[i].trim();
+		/*Browser.console.log("Sources", sources);
+		//
+		input.position = chunks["DFNC"] + 4;
+		var dfnc = input.readRefCStringVector(4);
+		Browser.console.log("DFNC", dfnc);
 		//
 		input.position = chunks["LOCL"];
-		positions = input.readInt32Vector();
+		var locl = input.readRefCStringVector(4);
+		Browser.console.log("LOCL", locl);*/
+		//
+		input.position = chunks["LOCL"];
+		var positions = input.readInt32Vector();
 		var doc = Browser.document;
-		for (i in 0 ... count) {
+		for (i in 0 ... positions.length) {
 			input.position = positions[i] + 4;
 			var name = input.readRefCString();
+			//trace(positions[i] + 4, name);
 			var p1:Int, p2:Int, s1:String;
 			if (name.startsWith("gml_Script_")) {
 				name = name.substring(11);
