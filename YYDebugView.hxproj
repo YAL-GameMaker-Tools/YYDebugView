@@ -41,7 +41,7 @@
   <!-- Executed before build -->
   <preBuildCommand />
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False" />
+  <postBuildCommand alwaysRun="False">cmd /C copy /Y bin\index.html bin\index.php</postBuildCommand>
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
