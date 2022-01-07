@@ -1,0 +1,5 @@
+-cp src
+-js bin/YYDebugView.js
+-D nodejs
+-main Main
+-dce full
